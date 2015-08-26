@@ -127,6 +127,12 @@ void LedControl::setLed(int addr, int row, int column, boolean state) {
     spiTransfer(addr, row+1,status[offset+row]);
 }
 
+void LedControl::setLed( int col, int row, boolean state ) {
+	int addr = col / 8;
+	col %= 8;
+	setLed( addr, row, col, state);
+}
+
 void LedControl::setRow(int addr, int row, byte value) {
     int offset;
     if(addr<0 || addr>=maxDevices)
@@ -150,6 +156,12 @@ void LedControl::setColumn(int addr, int col, byte value) {
         val=val & 0x01;
         setLed(addr,row,col,val);
     }
+}
+
+void LedControl::setColumn( int col, byte value ) {
+	int addr = col / 8;
+	col = col % 8;
+	setColumn( addr, col, value );
 }
 
 void LedControl::setDigit(int addr, int digit, byte value, boolean dp) {
@@ -206,6 +218,29 @@ void LedControl::spiTransfer(int addr, volatile byte opcode, volatile byte data)
         shiftOut(SPI_MOSI,SPI_CLK,MSBFIRST,spidata[i-1]);
     //latch the data onto the display
     digitalWrite(SPI_CS,HIGH);
-}    
+}
 
+void LedControl::writeSprite(int x, int y, const byte* sprite) {
+        int w = sprite[0];
+        int h = sprite[1];
+
+        if (h == 8 && y == 0) {
+                for (int i=0; i<w; i++)
+                {
+                        int c = x + i;
+                        if (c>=0 && c<80)
+                                setColumn(c, sprite[i+2]);
+                }
+	}
+        else {
+                for (int i=0; i<w; i++)
+                        for (int j=0; j<h; j++)
+                        {
+                                int c = x + i;
+                                int r = y + j;
+                                if (c>=0 && c<80 && r>=0 && r<8)
+                                        setLed(c, r, bitRead(sprite[i+2], j));
+                        }
+	}
+}
 

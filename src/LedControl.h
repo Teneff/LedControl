@@ -27,8 +27,6 @@
 #ifndef LedControl_h
 #define LedControl_h
 
-#include <avr/pgmspace.h>
-
 #if (ARDUINO >= 100)
 #include <Arduino.h>
 #else
@@ -139,6 +137,8 @@ class LedControl {
          */
         void setLed(int addr, int row, int col, boolean state);
 
+	void setLed( int col, int row, boolean state);
+
         /* 
          * Set all 8 Led's in a row to a new state
          * Params:
@@ -158,6 +158,11 @@ class LedControl {
          *		corresponding Led.
          */
         void setColumn(int addr, int col, byte value);
+
+	/*
+	 * Sets col and calculates the address
+	 */
+	void setColumn( int col, byte value );
 
         /* 
          * Display a hexadecimal digit on a 7-Segment Display
@@ -182,6 +187,8 @@ class LedControl {
          * dp	sets the decimal point.
          */
         void setChar(int addr, int digit, char value, boolean dp);
+
+	void writeSprite( int x, int y, const byte* sprite);
 };
 
 #endif	//LedControl.h
